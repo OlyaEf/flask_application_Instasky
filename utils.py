@@ -2,27 +2,37 @@ import json
 
 from json import JSONDecodeError
 
-from constants import JSON_FILE, JSON_COMMENTS
+from constants import JSON_POSTS, JSON_COMMENTS
 
 
 class PostHandler:
+
     @staticmethod
-    def get_posts_all():
+    def load_json_file(filename):
         """
-        Метод возвращает все посты, и обрабатывает исключение JSONDecodeError.
-        :return: все посты из json формата в формате python.
+        Метод читает файл JSON и обрабатывает его исключения.
+        :param filename: JSON файл.
+        :return: список из файла JSON.
         """
-        posts = []
+        data = []
         try:
-            with open(JSON_FILE, 'r', encoding='utf-8') as f:
-                posts = json.load(f)
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
         except FileNotFoundError:
             print('Ошибка файл не найден')
-            return posts
         except JSONDecodeError:
             print('Ошибка получения данных из Json')
-            return posts
-        return posts
+        return data
+
+    def get_posts_all(self):
+        """
+        Метод возвращает все посты из файла posts.json.
+        :return: все посты из json формата в формате python.
+        """
+        posts_data = self.load_json_file(JSON_POSTS)
+        # for post in posts_data:
+        #     post['content'] = post['content'][0:50] + '...'
+        return posts_data
 
     def get_posts_by_user(self, user_name):
         """
@@ -37,36 +47,30 @@ class PostHandler:
             for poster in posts_data:
                 if user_name.lower() == poster['poster_name'].lower():
                     posts.append(poster)
+                    # poster['content'] = poster['content'][0:50] + '...'
         except ValueError:
             print('Такого пользователя нет')
-            return posts
         return posts
 
-    @staticmethod
-    def get_comments_by_post_id(post_id):
+    def get_comments_by_post_id(self, post_id):
         """
         Метод возвращает комментарии определенного поста. Функция должна вызывать ошибку `ValueError`
         если такого поста нет и пустой список, если у поста нет комментов.
         :param post_id: атрибут метода для поиска поста, является идентификационный номер поста.
         :return: комментарий по id поста.
         """
-        data_comments = []
-        try:
-            with open(JSON_COMMENTS, 'r', encoding='utf-8') as f:
-                data_comments = json.load(f)
-        except FileNotFoundError:
-            print('Ошибка файл не найден')
-        except JSONDecodeError:
-            print('Ошибка получения данных из Json')
+        found_posts = self.get_post_by_pk(post_id)
+        if not found_posts:
+            raise ValueError('Такого поста нет')
 
         comments = []
+        data_comments = self.load_json_file(JSON_COMMENTS)
         try:
             for comment in data_comments:
                 if post_id == comment['post_id']:
                     comments.append(comment)
-        except ValueError:
-            print('Такого поста нет')
-            return comments
+        except KeyError:
+            print('Комментария по такому ключу нет')
         return comments
 
     def search_for_posts(self, query):
@@ -80,10 +84,10 @@ class PostHandler:
         try:
             for post in posts_data:
                 if query.lower() in post['content'].lower():
+                    # post['content'] = post['content'][0:50] + '...'
                     posts.append(post)
         except ValueError:
             print('Такого ключевого слова в постах нет')
-            return posts
         return posts
 
     def get_post_by_pk(self, pk):
@@ -93,16 +97,13 @@ class PostHandler:
         :return: пост.
         """
         posts_data = self.get_posts_all()
-        post_pk = []
         try:
             for post in posts_data:
                 if pk == post['pk']:
-                    post_pk.append(post)
+                    return post
         except ValueError:
             print('Поста по такому "pk" нет')
-            return post_pk
-        return post_pk
 
 
-post_handler = PostHandler()
-print(post_handler.get_post_by_pk(1))
+# post_handler = PostHandler()
+# print(post_handler.search_for_posts('еда'))
