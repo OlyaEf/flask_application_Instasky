@@ -37,10 +37,11 @@ def search():
     """
     key_word = request.args.get('s')
     post_search = post_handler.search_for_posts(key_word)
-    return render_template('search.html', post_search=post_search, key_word=key_word)
+    len_posts = len(post_search)
+    return render_template('search.html', post_search=post_search, key_word=key_word, len_posts=len_posts)
 
 
-@app.route('/users/<username>')
+@app.route('/users/<username>/')
 def posts_user(username):
     """
     Представление с выводом постов конкретного пользователя.

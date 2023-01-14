@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Главная страница</title>
-  <link href="../static/css/styles.min.css" rel="stylesheet">
+  <title>SKYPROGRAM</title>
+  <link href="/static/css/styles.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -27,7 +27,7 @@
 
     <div class="search">
       <form action="/search" class="search__form">
-        <input type="search" class="search__input">
+        <input type="search" name="s" class="search__input">
       </form>
     </div>
 
@@ -39,13 +39,13 @@
             <div class="item__ava-wrap">
               <img src="{{ post.poster_avatar }}" alt="" class="item__ava" width="47">
             </div>
-            <span class="item__username">{{ poster.poster_name }}</span>
+            <span class="item__username">{{ post.poster_name }}</span>
           </a>
         </div>
         <a href="/posts/{{ post.pk }}" class="item__post-link">
           <img src="{{ post.pic }}" alt="" width="348" class="item__post-img">
         </a>
-        <p class="item__descr">{{ post.content }}</p>
+        <p class="item__descr">{{ post.content[:50] }}</p>
         <div class="item__post-info">
           <div class="item__counter">
             <img src="../static/img/eye.png" alt="" class="item__counter-icon" width="26">

@@ -105,5 +105,5 @@ class PostHandler:
             print('Поста по такому "pk" нет')
 
 
-# post_handler = PostHandler()
-# print(post_handler.search_for_posts('еда'))
+post_handler = PostHandler()
+print(post_handler.search_for_posts('еда'))
