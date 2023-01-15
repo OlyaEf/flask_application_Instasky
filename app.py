@@ -1,12 +1,21 @@
-from flask import Flask, render_template, request, Blueprint, jsonify
+from flask import Flask, render_template, request
+
+import logging
+
+from api_bp.api import api_blueprint
 from utils import PostHandler
 
-import logging, datetime
-
 app = Flask(__name__)
+
+# Декодинг JSON файла.
+app.config['JSON_AS_ASCII'] = False
+
 post_handler = PostHandler()
-api_blueprint = Blueprint('api_blueprint', __name__)
-logging.basicConfig(filename='./logs/basic.log', level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
+# Регистрация blueprint.
+app.register_blueprint(api_blueprint)
+# Логи хранятся в папке logs в файле `api.log`. Формат логов должен быть таким: %(asctime)s [%(levelname)s] %(message)s.
+logging.basicConfig(filename='logs/basic.log', level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 
 @app.route('/')
@@ -63,7 +72,7 @@ def page_not_found(e):
     :return: возвращает статус-код 404.
     """
     # устанавливаем статус 404 явно
-    return render_template('Ошибка 404, Страница отсутствует'), 404
+    return 'Ошибка 404, Страница отсутствует', 404
 
 
 @app.errorhandler(500)
@@ -74,20 +83,7 @@ def page_not_found(e):
     :return: возвращает статус код 500.
     """
     # устанавливаем статус 500 явно
-    return render_template('Ошибка 500, Внутренняя ошибка сервера'), 500
-
-
-@api_blueprint.route('/api/posts', methods=['GET'])
-def get_all_posts():
-    logging.info('Запросы /api/posts')
-    result = post_handler.get_posts_all()
-    return jsonify(result)
-
-
-@api_blueprint.route('/api/posts/<post_id>', methods=['GET'])
-def get_post_by_id(post_id):
-    logging.info(f'{datetime.datetime.now()} [INFO] Запрос /api/posts/{post_id}')
-    return jsonify(post_handler.get_post_by_pk(post_id))
+    return 'Ошибка 500, Внутренняя ошибка сервера', 500
 
 
 if __name__ == '__main__':

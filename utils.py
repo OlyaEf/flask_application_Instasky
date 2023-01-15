@@ -30,8 +30,6 @@ class PostHandler:
         :return: все посты из json формата в формате python.
         """
         posts_data = self.load_json_file(JSON_POSTS)
-        # for post in posts_data:
-        #     post['content'] = post['content'][0:50] + '...'
         return posts_data
 
     def get_posts_by_user(self, user_name):
@@ -47,7 +45,6 @@ class PostHandler:
             for poster in posts_data:
                 if user_name.lower() == poster['poster_name'].lower():
                     posts.append(poster)
-                    # poster['content'] = poster['content'][0:50] + '...'
         except ValueError:
             print('Такого пользователя нет')
         return posts
@@ -103,7 +100,3 @@ class PostHandler:
                     return post
         except ValueError:
             print('Поста по такому "pk" нет')
-
-
-post_handler = PostHandler()
-print(post_handler.search_for_posts('еда'))
