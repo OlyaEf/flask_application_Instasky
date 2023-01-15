@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Blueprint, jsonify
 from utils import PostHandler
 
-post_handler = PostHandler()
+import logging, datetime
 
 app = Flask(__name__)
+post_handler = PostHandler()
+api_blueprint = Blueprint('api_blueprint', __name__)
+logging.basicConfig(filename='./logs/basic.log', level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 
 @app.route('/')
@@ -50,6 +53,41 @@ def posts_user(username):
     """
     user_posts = post_handler.get_posts_by_user(username)
     return render_template('user-feed.html', user_posts=user_posts)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """
+    Обработчик запросов к несуществующим страницам.
+    :param e: выводит 'Ошибка 404, Страница отсутствует'.
+    :return: возвращает статус-код 404.
+    """
+    # устанавливаем статус 404 явно
+    return render_template('Ошибка 404, Страница отсутствует'), 404
+
+
+@app.errorhandler(500)
+def page_not_found(e):
+    """
+    Обработчик ошибок, возникших на стороне сервера.
+    :param e: выводит 'Ошибка 500, Внутренняя ошибка сервера'.
+    :return: возвращает статус код 500.
+    """
+    # устанавливаем статус 500 явно
+    return render_template('Ошибка 500, Внутренняя ошибка сервера'), 500
+
+
+@api_blueprint.route('/api/posts', methods=['GET'])
+def get_all_posts():
+    logging.info('Запросы /api/posts')
+    result = post_handler.get_posts_all()
+    return jsonify(result)
+
+
+@api_blueprint.route('/api/posts/<post_id>', methods=['GET'])
+def get_post_by_id(post_id):
+    logging.info(f'{datetime.datetime.now()} [INFO] Запрос /api/posts/{post_id}')
+    return jsonify(post_handler.get_post_by_pk(post_id))
 
 
 if __name__ == '__main__':
